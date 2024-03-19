@@ -11,6 +11,7 @@ import study.datajpa.entity.Team;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
@@ -127,5 +128,20 @@ void basicCRUD() {
         for (Member member : result) {
             System.out.println("member = " + member);
         }
+    }
+
+    @Test
+    void retunrType() {
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        Member findMember = memberRepository.findMemberByUsername("AAA");
+        Optional<Member> findOptional = memberRepository.findOptionalByUsername("AAA");
+
+        System.out.println("findMember = " + findMember);
+        System.out.println("findOptional = " + findOptional);
+
     }
 }
