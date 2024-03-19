@@ -16,7 +16,6 @@ import study.datajpa.entity.Team;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -149,11 +148,11 @@ class MemberRepositoryTest {
         memberRepository.save(m1);
         memberRepository.save(m2);
 
-        Member findMember = memberRepository.findMemberByUsername("AAA");
-        Optional<Member> findOptional = memberRepository.findOptionalByUsername("AAA");
-
-        System.out.println("findMember = " + findMember);
-        System.out.println("findOptional = " + findOptional);
+//        Member findMember = memberRepository.findMemberByUsername("AAA");
+//        Optional<Member> findOptional = memberRepository.findOptionalByUsername("AAA");
+//
+//        System.out.println("findMember = " + findMember);
+//        System.out.println("findOptional = " + findOptional);
     }
 
     @Test
@@ -238,8 +237,33 @@ class MemberRepositoryTest {
 
         for (Member member : members) {
             System.out.println("member = " + member.getUsername());
-            System.out.println("member.temClass = " + member.getTeam().getClass());
-            System.out.println("member.tem = " + member.getTeam().getName());
+//            System.out.println("member.temClass = " + member.getTeam().getClass());
+//            System.out.println("member.tem = " + member.getTeam().getName());
         }
+    }
+
+    @Test
+    void queryHint() {
+        // given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = memberRepository.findReadOnlyByUsername("member1"); // 읽기 전용 옵션을 사용하면 해당 영속성 컨텍스트에서 해당 엔티티를 수정할 수 없음
+        findMember.setUsername("member2"); // 변경 감지로 인해 변경이 감지되어 수정 쿼리가 나감
+
+        em.flush();
+    }
+
+    @Test
+    void lock() {
+        // given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        // when
+        List<Member> result = memberRepository.findLockByUsername("member1");
     }
 }
