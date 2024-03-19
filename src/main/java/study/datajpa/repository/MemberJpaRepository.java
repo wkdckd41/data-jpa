@@ -14,31 +14,44 @@ public class MemberJpaRepository {
     @PersistenceContext // JPA의 EntityManager를 주입받을 수 있음
     private EntityManager em; // JPA의 모든 기능을 가지고 있음
 
-    public Member save(Member member) { // 저장
+    // 저장
+    public Member save(Member member) {
         em.persist(member); // 영속성 컨텍스트에 저장
         return member;
     }
 
-    public void delete(Member member) { // 삭제
+    // 삭제
+    public void delete(Member member) {
         em.remove(member);
     }
 
-    public List<Member> findAll() { // 전체 조회
+    // 전체 조회
+    public List<Member> findAll() {
         return em.createQuery("select m from Member m", Member.class)
                 .getResultList();
     }
 
-    public Optional<Member> findById(Long id) { // 단건 조회
+    // 단건 조회
+    public Optional<Member> findById(Long id) {
         Member member = em.find(Member.class, id);
         return Optional.ofNullable(member);
     }
 
-    public long count() { // 카운트
+    // 카운트
+    public long count() {
         return em.createQuery("select count(m) from Member m", Long.class)
                 .getSingleResult();
     }
 
-    public Member find(Long id) { // 수정
+    // 수정
+    public Member find(Long id) {
         return em.find(Member.class, id);
+    }
+
+    public List<Member> findByUsernameAndAgeGreaterThen(String username, int age) {
+        return em.createQuery("select m from Member m where m.username = :username and m.age > :age", Member.class)
+                .setParameter("username", username)
+                .setParameter("age", age)
+                .getResultList();
     }
 }
