@@ -142,6 +142,5 @@ void basicCRUD() {
 
         System.out.println("findMember = " + findMember);
         System.out.println("findOptional = " + findOptional);
-
     }
 }
