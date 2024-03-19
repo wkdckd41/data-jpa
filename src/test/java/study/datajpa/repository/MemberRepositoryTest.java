@@ -3,6 +3,9 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -14,13 +17,16 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @SpringBootTest
 @Transactional
 @Rollback(false)
 class MemberRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
-    @Autowired TeamRepository teamRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    TeamRepository teamRepository;
 
     @Test
     void testMember() {
@@ -35,7 +41,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-void basicCRUD() {
+    void basicCRUD() {
         Member member1 = new Member("member1");
         Member member2 = new Member("member2");
         memberRepository.save(member1);
@@ -142,5 +148,35 @@ void basicCRUD() {
 
         System.out.println("findMember = " + findMember);
         System.out.println("findOptional = " + findOptional);
+    }
+
+    @Test
+    void paging() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        // when
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        // DTO로 변환
+        Page<MemberDto> toMap = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+        // then
+        List<Member> content = page.getContent();
+        long totalElements = page.getTotalElements();
+
+        assertEquals(content.size(), 3); // 조회된 데이터 수
+        assertEquals(page.getTotalElements(), 5); // 전체 데이터 수
+        assertEquals(page.getNumber(), 0); // 현재 페이지 번호
+        assertEquals(page.getTotalPages(), 2); // 전체 페이지 수
+        assertEquals(page.isFirst(), true); // 첫번째 항목인가?
+        assertEquals(page.hasNext(), true); // 다음 페이지가 있는가?
     }
 }
