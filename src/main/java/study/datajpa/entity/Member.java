@@ -7,6 +7,11 @@ import lombok.*;
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "username", "age"})
+@NamedQuery(
+        name = "Member.findByUsername",
+        query = "select m from Member m where m.username = :username"
+) // 이름이 있는 JPQL 쿼리
+@NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team")) // 엔티티 그래프 정의
 public class Member {
 
     @Id @GeneratedValue
