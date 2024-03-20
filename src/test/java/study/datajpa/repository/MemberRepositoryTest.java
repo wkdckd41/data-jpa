@@ -293,4 +293,25 @@ class MemberRepositoryTest {
             System.out.println("nestedClosedProjections = " + nestedClosedProjections.getTeam().getName());
         }
     }
+
+    @Test
+    void nativeQuery() {
+        // given
+        Member m1 = new Member("m1", 0);
+        Member m2 = new Member("m2", 0);
+        em.persist(m1);
+
+        em.flush();
+        em.clear();
+
+        // when
+//        Member result = memberRepository.findByNativeQuery("m1");
+        Page<MemberProjection> result = memberRepository.findByNativeProjection(PageRequest.of(0, 10));
+        List<MemberProjection> content = result.getContent();
+        for (MemberProjection memberProjection : content) {
+            System.out.println("memberProjection = " + memberProjection.getUsername());
+            System.out.println("memberProjection = " + memberProjection.getTeamName());
+        }
+//        System.out.println("result = " + result);
+    }
 }
